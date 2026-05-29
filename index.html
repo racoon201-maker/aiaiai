@@ -1,0 +1,745 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>화상 수액 계산기</title>
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="화상수액계산">
+    <link class="apple-touch-icon" href="https://fav.farm/🚑">
+    <link rel="icon" href="https://fav.farm/🚑">
+    <style>
+        :root {
+            --primary-color: #d9534f;
+            --secondary-color: #0275d8;
+            --dark-color: #292b2c;
+            --light-color: #f7f7f7;
+            --sub-color: #6f42c1;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+            background-color: var(--light-color);
+            color: var(--dark-color);
+            margin: 0;
+            padding: 10px;
+            padding-bottom: 130px;
+            font-size: 16px;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: white;
+            padding: 16px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            box-sizing: border-box;
+        }
+        h1 {
+            font-size: 1.3rem;
+            color: var(--primary-color);
+            text-align: center;
+            margin-top: 0;
+            border-bottom: 2px solid var(--primary-color);
+            padding-bottom: 10px;
+        }
+        .form-group {
+            margin-bottom: 12px;
+        }
+        label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 4px;
+            font-size: 0.95rem;
+        }
+        input[type="number"], select {
+            width: 100%;
+            padding: 12px;
+            box-sizing: border-box;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            font-size: 1.05rem;
+            background-color: #fff;
+        }
+        input[type="number"]:focus, select:focus {
+            outline: none;
+            border-color: var(--secondary-color);
+        }
+        .btn-group {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+        .btn-type {
+            flex: 1;
+            padding: 14px;
+            border: 2px solid #ccc;
+            background: #fff;
+            font-size: 1.05rem;
+            font-weight: bold;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.1s ease;
+        }
+        .btn-type.active {
+            border-color: var(--primary-color);
+            background: var(--primary-color);
+            color: white;
+        }
+        .btn-type-sub {
+            flex: 1;
+            padding: 10px;
+            border: 2px solid #ccc;
+            background: #fff;
+            font-size: 0.95rem;
+            font-weight: bold;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.1s ease;
+            color: #555;
+        }
+        .btn-type-sub.active {
+            border-color: var(--secondary-color);
+            background: var(--secondary-color);
+            color: white;
+        }
+        .weight-estimator-box {
+            background: #f3f0fa;            
+            border: 1px solid #d6cce6;
+            border-radius: 8px;
+            padding: 12px;
+            margin-bottom: 12px;
+        }
+        .estimator-title {
+            font-weight: bold;
+            color: var(--sub-color);
+            margin-bottom: 8px;
+            font-size: 0.9rem;
+        }
+        .estimator-grid {
+            display: grid;
+            grid-template-columns: 1.2fr 1fr;
+            gap: 8px;
+        }
+        .age-split-container, .adult-est-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 4px;
+            align-items: center;
+        }
+        .est-btn {
+            background: #0275d8; color: white; border: none; border-radius: 4px;
+            padding: 8px 4px; cursor: pointer; font-size: 0.85rem; font-weight: bold;
+        }
+        .est-btn:active { background: #025aa5; }
+        .tbsa-calculator {
+            background: #fdf5f5;
+            border: 1px solid #f5c6cb;
+            border-radius: 8px;
+            padding: 12px;
+            margin-bottom: 15px;
+        }
+        .tbsa-title {
+            font-weight: bold;
+            color: #721c24;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.95rem;
+        }
+        .lb-indicator {
+            font-size: 0.8rem;
+            color: #0275d8;
+            background: #e6f2ff;
+            padding: 4px 8px;
+            border-radius: 4px;
+            margin-bottom: 8px;
+            display: none;
+            text-align: center;
+            font-weight: bold;
+        }
+        .grid-buttons {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 6px;
+        }
+        .btn-part {
+            padding: 11px 8px;
+            background: white;
+            border: 1px solid #ced4da;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            cursor: pointer;
+            text-align: left;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.2s;
+        }
+        .btn-part.selected {
+            background: #f8d7da;
+            border-color: #f5c6cb;
+            color: #721c24;
+            font-weight: bold;
+        }
+        .result-box {
+            border-radius: 8px;
+            margin-top: 15px;
+            display: none;
+        }
+        .result-box.show {
+            display: block;
+        }
+        .result-title {
+            font-size: 1.15rem;
+            font-weight: bold;
+            color: #155724;
+            margin-bottom: 8px;
+            text-align: center;
+        }
+        .result-item {
+            margin-bottom: 8px;
+            font-size: 0.95rem;
+            line-height: 1.5;
+        }
+        .highlight {
+            font-weight: bold;
+            color: #d9534f;
+            font-size: 1.1rem;
+        }
+        .main-speed {
+            color: #0275d8;
+            font-size: 1.2rem;
+            font-weight: bold;
+        }
+        .critical-instruction-card {
+            background: #ffeaeb;
+            border: 3px solid #d9534f;
+            border-radius: 12px 12px 0 0;
+            padding: 14px;
+            text-align: center;
+            box-shadow: 0 -4px 12px rgba(217, 83, 79, 0.2);
+            position: fixed;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100%;
+            max-width: 600px;
+            box-sizing: border-box;
+            z-index: 9999;
+            border-bottom: none;
+        }
+        .critical-drop-text {
+            display: block;
+            font-size: 1.5rem;
+            font-weight: 900;
+            color: #d9534f;
+            line-height: 1.4;
+            word-break: keep-all;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>🚑 화상 수액 계산기 (ABA 지침)</h1>
+    
+    <div class="form-group">
+        <label>환자 구분</label>
+        <div class="btn-group">
+            <button type="button" class="btn-type active" id="btn-adult" onclick="setPatientType('adult')">성인 / 청소년</button>
+            <button type="button" class="btn-type" id="btn-child" onclick="setPatientType('child')">소아 (30kg 이하)</button>
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label style="font-size: 0.85rem; color: #555;">특수 화상 여부 (원인)</label>
+        <div class="btn-group">
+            <button type="button" class="btn-type-sub active" id="btn-burn-normal" onclick="setBurnType('normal')">일반 (열·화학)</button>
+            <button type="button" class="btn-type-sub" id="btn-burn-electrical" onclick="setBurnType('electrical')">고압 전기 ⚡</button>
+        </div>
+    </div>
+
+    <div class="weight-estimator-box">
+        <div class="estimator-title" style="display: flex; justify-content: space-between; align-items: center;">
+            <span>⚙️ 환자 정보 유추 및 비상 처치</span>
+            <button type="button" style="padding:4px 8px; font-size:0.75rem; cursor:pointer; border-radius:4px; border:1px solid #ccc; background:#fff;" onclick="resetEstimator()">초기화</button>
+        </div>
+        <div class="estimator-grid">
+            <div>
+                <label id="est-label-info" style="font-size:0.8rem; color:#555;">나이 선택</label>
+                <div id="est-inputs-container">
+                    </div>
+            </div>
+            <div>
+                <label style="font-size:0.8rem; color:#555;">비상 처치 (정보 모름)</label>
+                <select id="est-unknown" onchange="estimateWeight('unknown')">
+                </select>
+            </div>
+        </div>
+    </div>
+
+    <div class="form-group">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+            <label for="weight" style="margin-bottom: 0;">환자 체중 (kg)</label>
+            <button type="button" id="btn-apply-est" class="est-btn" style="padding: 4px 8px; font-size: 0.8rem;" onclick="applyEstimatedWeight()">추정</button>
+        </div>
+        <input type="number" id="weight" placeholder="직접 입력 시 나이/면적 자동 추정" oninput="handleWeightInput()">
+    </div>
+
+    <div class="form-group">
+        <label for="tbsa">2도~3도 화상 면적 (TBSA %) <span style="color:hotpink; font-size:0.85rem;">(1도 제외)</span></label>
+        <input type="number" id="tbsa" placeholder="직접 입력 / 부위 선택 시 자동 연동" min="0" max="100" oninput="calculateFluid()">
+    </div>
+
+    <div class="tbsa-calculator">
+        <div class="tbsa-title">
+            <span id="calc-title">🧩 신체 부위 선택 (성인 기준)</span>
+            <div>
+                <button type="button" style="padding:4px 8px; font-size:0.75rem; cursor:pointer; border-radius:4px; border:1px solid #d9534f; background:#fff; color:#d9534f; font-weight:bold; margin-right:4px;" onclick="selectAllTbsaParts()">전신 100%</button>
+                <button type="button" style="padding:4px 8px; font-size:0.75rem; cursor:pointer; border-radius:4px; border:1px solid #ccc; background:#fff;" onclick="resetTbsaParts()">초기화</button>
+            </div>
+        </div>
+        <div id="lb-indicator" class="lb-indicator">💡 Lund-Browder 적용: 추정 연령 0개월 반영 중</div>
+        <div class="grid-buttons" id="parts-container">
+        </div>
+    </div>
+
+    <div id="result" class="result-box">
+        <div class="critical-instruction-card">
+            <span class="critical-drop-text" id="res-gtt-verbal-critical">
+                ⚠️ 데이터 입력 대기 중
+            </span>
+        </div>
+
+        <div id="normal-protocol-view" style="background: #d4edda; border: 1px solid #c3e6cb; padding:12px; border-radius:8px;">
+            <div class="result-title">📊 응급 수액 투여 프로토콜 정보</div>
+            <div class="result-item">
+                • 적용 공식: <span id="res-formula" style="font-weight:bold;">-</span><br>
+                • 24시간 총 화상 수액량: <span id="res-total" class="highlight">0</span> mL
+            </div>
+            <div id="child-maintenance-box" class="result-item" style="background:#e6f2ff; padding:8px; border-radius:4px; display:none; border: 1px solid #bfe0ff;">
+                <strong>👶 소아 유지수액 (Holiday-Segar 공식)</strong><br>
+                - 일일 유지수액량: <span id="res-child-day-maintenance">0</span> mL/day<br>
+                - 시간당 유지수액 속도: <span id="res-child-hr-maintenance">0</span> mL/h
+            </div>
+
+            <div class="result-item" style="background: #f8f9fa; padding: 10px; border-radius: 4px; margin-top:8px; border:1px solid #ddd;">
+                <strong>🔥 초기 8시간 현장 수액 세부속도</strong><br>
+                - 8시간 화상 수액량: <span id="res-8h">0</span> mL <span id="res-child-add-text" style="font-size:0.85rem; color:#555;"></span><br>
+                - 시간당 총 주입 속도: <span id="res-total-speed" class="main-speed">0</span> mL/h<br>
+                - 정확한 분당 점적 방울 수: <span id="res-gtt-speed" style="font-weight:bold; color:#333;">0</span> gtt/min
+            </div>
+        </div>
+
+        <div id="unknown-protocol-view" style="display:none;">
+            <div class="result-title" style="color:#721c24;">🚨 긴급 임시 고정속도 가이드</div>
+            <div style="background:#fff3cd; border:1px solid #ffeeba; padding:12px; border-radius:6px; color:#856404; font-size: 0.9rem;">
+                <strong>환자 식별 정보 없음 (체중/연령 측정 불가)</strong><br>
+                현장 긴급 프로토콜에 의거하여 위 카드에 명시된 임시 고정 속도로 공급을 유지하십시오.<br>
+                - 지정 기준: <span id="res-unk-agegroup" style="font-weight:bold;">-</span><br>
+                - 임시 지정 용량: <span id="res-unk-speed" style="font-weight:bold;">0 mL/h</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    let currentType = 'adult';
+    let burnType = 'normal';
+    let isUnknownWeight = false;
+    let unknownAgeGroup = ''; 
+
+    const partsData = {
+        adult: [
+            { name: "머리/목 앞면", val: 4.5 }, { name: "머리/목 뒷면", val: 4.5 },
+            { name: "전면 가슴", val: 9 }, { name: "전면 복부", val: 9 },
+            { name: "후면 등", val: 9 }, { name: "후면 허리/엉덩이", val: 9 },
+            { name: "오른팔 앞면", val: 4.5 }, { name: "오른팔 뒷면", val: 4.5 },
+            { name: "왼팔 앞면", val: 4.5 }, { name: "왼팔 뒷면", val: 4.5 },
+            { name: "오른다리 앞면", val: 9 }, { name: "오른다리 뒷면", val: 9 },
+            { name: "왼다리 앞면", val: 9 }, { name: "왼다리 뒷면", val: 9 },
+            { name: "회음부", val: 1 }
+        ],
+        child: [
+            { name: "소아 머리 앞면", val: 9 }, { name: "소아 머리 뒷면", val: 9 },
+            { name: "전면 가슴", val: 9 }, { name: "전면 복부", val: 9 },
+            { name: "후면 등", val: 9 }, { name: "후면 허리/엉덩이", val: 9 },
+            { name: "오른팔 앞면", val: 4.5 }, { name: "오른팔 뒷면", val: 4.5 },
+            { name: "왼팔 앞면", val: 4.5 }, { name: "왼팔 뒷면", val: 4.5 },
+            { name: "소아 오른다리 앞면", val: 6.75 }, { name: "소아 오른다리 뒷면", val: 6.75 },
+            { name: "소아 왼다리 앞면", val: 6.75 }, { name: "소아 왼다리 뒷면", val: 6.75 },
+            { name: "회음부", val: 1 }
+        ]
+    };
+
+    let selectedParts = [];
+
+    function setBurnType(type) {
+        burnType = type;
+        document.getElementById('btn-burn-normal').classList.toggle('active', type === 'normal');
+        document.getElementById('btn-burn-electrical').classList.toggle('active', type === 'electrical');
+        calculateFluid();
+    }
+
+    function updateSelectors() {
+        const container = document.getElementById('est-inputs-container');
+        const unknownSelect = document.getElementById('est-unknown');
+        const labelInfo = document.getElementById('est-label-info');
+                
+        if (currentType === 'adult') {
+            labelInfo.innerText = "추정용 환자 정보";
+            document.getElementById('btn-apply-est').style.display = 'block';
+            let html = `<div class="adult-est-container">
+                <select id="est-age" onchange="handleAdultEstChange()"><option value="" style="color: green;">나이(대)</option>`;
+            for(let i=10; i<=90; i+=10) html += `<option value="${i}">${i}대</option>`;
+            html += `</select>
+                <select id="est-gender" onchange="handleAdultEstChange()">
+                    <option value="" style="color: green;">성별</option><option value="M">남성</option><option value="F">여성</option>
+                </select>
+                <select id="est-body" onchange="handleAdultEstChange()">
+                    <option value="" style="color: green;">체형</option><option value="18.5">저체중</option><option value="22">정상</option><option value="26">과체중</option><option value="30">비만</option>
+                </select>
+                <select id="est-height" onchange="handleAdultEstChange()">
+                    <option value="" style="color: green;">키</option>`;
+            for(let h=130; h<=210; h+=10) html += `<option value="${h}">${h}cm</option>`;
+            html += `</select></div>`;
+            container.innerHTML = html;
+                        
+            unknownSelect.innerHTML = `<option value="">-- 선택 --</option><option value="UNKNOWN_OVER13">⚠️ 정보모름 (성인/청소년)</option>`;
+        } else {
+            labelInfo.innerText = "나이 입력 시 면적 자동 연동";
+            document.getElementById('btn-apply-est').style.display = 'none';
+            let html = `<div class="age-split-container">
+                <select id="est-year" onchange="handleChildEstChange()"><option value="" style="color: green;">년</option>`;
+            for (let y = 0; y <= 9; y++) html += `<option value="${y}">${y}년</option>`;
+            html += `</select>
+                <select id="est-month" onchange="handleChildEstChange()"><option value="" style="color: green;">개월</option>`;
+            for (let m = 0; m <= 11; m++) html += `<option value="${m}">${m}개월</option>`;
+            html += `</select></div>`;
+            container.innerHTML = html;
+                        
+            unknownSelect.innerHTML = `<option value="">-- 선택 --</option>
+                <option value="UNKNOWN_UNDER5">⚠️ 정보모름 (5세 이하)</option>
+                <option value="UNKNOWN_6TO12">⚠️ 정보모름 (6~12세)</option>`;
+        }
+    }
+
+    function setPatientType(type) {
+        if (currentType !== type) document.getElementById('weight').value = '';
+        currentType = type;
+        isUnknownWeight = false;
+        unknownAgeGroup = '';
+                
+        document.getElementById('btn-adult').classList.toggle('active', type === 'adult');
+        document.getElementById('btn-child').classList.toggle('active', type === 'child');
+        document.getElementById('calc-title').innerText = type === 'adult' ? "🧩 신체 부위 선택 (성인 기준)" : "🧩 신체 부위 선택 (Lund-Browder 소아 기준)";
+        
+        document.getElementById('lb-indicator').style.display = type === 'child' ? 'block' : 'none';
+        document.getElementById('weight').disabled = false;
+        
+        if(type === 'child') updateLundBrowderChart(0, false);
+
+        updateSelectors();
+        resetTbsaParts();
+    }
+
+    function updateLundBrowderChart(months, showIndicator = true) {
+        let hTotal;
+        if (months < 12) hTotal = 19 - (months * (2 / 12));
+        else if (months < 60) hTotal = 17 - ((months - 12) * (4 / 48));
+        else if (months <= 120) hTotal = 13 - ((months - 60) * (2 / 60));
+        else if (months <= 180) hTotal = 11 - ((months - 120) * (2 / 60));
+        else hTotal = 9;
+
+        let headHalf = Math.round((hTotal / 2) * 100) / 100;
+        let legQuarter = Math.round(((45 - hTotal) / 4) * 100) / 100;
+
+        partsData.child[0].val = headHalf; 
+        partsData.child[1].val = headHalf;
+        partsData.child[10].val = legQuarter; 
+        partsData.child[11].val = legQuarter;
+        partsData.child[12].val = legQuarter; 
+        partsData.child[13].val = legQuarter;
+
+        if(showIndicator) {
+            const yr = Math.floor(months / 12);
+            const mo = months % 12;
+            const text = yr > 0 ? `${yr}년 ${mo}개월` : `${mo}개월`;
+            const indicator = document.getElementById('lb-indicator');
+            indicator.style.display = 'block';
+            indicator.innerText = `💡 Lund-Browder 적용: 추정 연령 [${text}] 반영 중`;
+        }
+
+        renderParts();
+        updateTbsaFromSelection();
+    }
+
+    function handleChildEstChange() {
+        const yVal = document.getElementById('est-year').value;
+        const mVal = document.getElementById('est-month').value;
+        const unknownSel = document.getElementById('est-unknown');
+                
+        if (yVal !== "" && mVal !== "") {
+            unknownSel.value = "";
+            unknownSel.disabled = true;
+            isUnknownWeight = false;
+            document.getElementById('weight').disabled = false;
+
+            const years = parseInt(yVal);
+            const months = parseInt(mVal);
+            const totalMonths = (years * 12) + months;
+
+            let estimatedWeight = 0;
+            if (totalMonths === 0) estimatedWeight = 3.5;
+            else if (totalMonths < 12) estimatedWeight = (totalMonths + 9) / 2;
+            else estimatedWeight = ((totalMonths / 12) * 2) + 8;
+            
+            if (estimatedWeight > 30) estimatedWeight = 30;
+            document.getElementById('weight').value = estimatedWeight.toFixed(1);
+
+            updateLundBrowderChart(totalMonths, true);
+        } else {
+            unknownSel.disabled = false;
+            document.getElementById('weight').value = '';
+            document.getElementById('lb-indicator').style.display = 'none';
+            updateLundBrowderChart(0, false); 
+        }
+        calculateFluid();
+    }
+
+    function handleWeightInput() {
+        const wVal = parseFloat(document.getElementById('weight').value);
+        
+        if (currentType === 'child' && wVal > 0) {
+            const yVal = document.getElementById('est-year').value;
+            const mVal = document.getElementById('est-month').value;
+            
+            if (yVal === "" && mVal === "") {
+                let estimatedMonths = 0;
+                if (wVal < 10) {
+                    estimatedMonths = Math.round((wVal * 2) - 9);
+                    if (estimatedMonths < 0) estimatedMonths = 0;
+                } else {
+                    estimatedMonths = Math.round(((wVal - 8) / 2) * 12);
+                    if (estimatedMonths < 12) estimatedMonths = 12;
+                }
+                updateLundBrowderChart(estimatedMonths, true);
+            }
+        }
+        calculateFluid();
+    }
+
+    function handleAdultEstChange() {
+        const age = document.getElementById('est-age').value;
+        const gender = document.getElementById('est-gender').value;
+        const body = document.getElementById('est-body').value; 
+        const height = document.getElementById('est-height').value;
+        const unknownSel = document.getElementById('est-unknown');
+                
+        if (!age || !gender || !body || !height) {
+            document.getElementById('weight').value = "";
+        }
+
+        if (age || gender || body || height) {
+            unknownSel.value = "";
+            unknownSel.disabled = true;
+            isUnknownWeight = false;
+            document.getElementById('weight').disabled = false;
+        } else {
+            unknownSel.disabled = false;
+        }
+        calculateFluid();
+    }
+    
+    function applyEstimatedWeight() {
+        if (currentType === 'adult') {
+            const gender = document.getElementById('est-gender') ? document.getElementById('est-gender').value : '';
+            const body = document.getElementById('est-body') ? document.getElementById('est-body').value : ''; 
+            const height = document.getElementById('est-height') ? document.getElementById('est-height').value : '';
+                        
+            if (body && height) {
+                let bmi = parseFloat(body);
+                if (gender === 'F' && bmi === 22) bmi = 21; 
+                let h_m = parseFloat(height) / 100;
+                let estW = bmi * (h_m * h_m);
+                document.getElementById('weight').value = estW.toFixed(1);
+                calculateFluid();
+            } else {
+                alert("체형과 키 정보를 모두 선택해주세요.");
+            }
+        }
+    }
+
+    function resetEstimator() {
+        if (currentType === 'adult') {
+            if (document.getElementById('est-age')) document.getElementById('est-age').value = "";
+            if (document.getElementById('est-gender')) document.getElementById('est-gender').value = "";
+            if (document.getElementById('est-body')) document.getElementById('est-body').value = "";
+            if (document.getElementById('est-height')) document.getElementById('est-height').value = "";
+        } else {
+            if (document.getElementById('est-year')) document.getElementById('est-year').value = "";
+            if (document.getElementById('est-month')) document.getElementById('est-month').value = "";
+            document.getElementById('lb-indicator').style.display = 'none';
+        }
+        
+        const unknownSel = document.getElementById('est-unknown');
+        if (unknownSel) { unknownSel.value = ""; unknownSel.disabled = false; }
+                
+        isUnknownWeight = false;
+        document.getElementById('weight').disabled = false;
+        document.getElementById('weight').value = ""; 
+        calculateFluid();
+    }
+
+    function estimateWeight(source) {
+        if (source === 'unknown') {
+            const unknownVal = document.getElementById('est-unknown').value;
+            resetEstimator();
+            document.getElementById('est-unknown').value = unknownVal;
+            
+            if (unknownVal) {
+                isUnknownWeight = true;
+                document.getElementById('weight').value = "";
+                document.getElementById('weight').disabled = true;
+                if (unknownVal === "UNKNOWN_UNDER5") unknownAgeGroup = 'under5';
+                else if (unknownVal === "UNKNOWN_6TO12") unknownAgeGroup = '6to12';
+                else if (unknownVal === "UNKNOWN_OVER13") unknownAgeGroup = 'over13';
+            }
+        }
+        calculateFluid();
+    }
+
+    function getRealisticDropRate(gttPerMin) {
+        if (gttPerMin <= 0) return { sec: 0, drops: 0 };
+        const dropsPerSec = gttPerMin / 60;
+        if (dropsPerSec >= 1) return { sec: 1, drops: Math.round(dropsPerSec), isContinuous: Math.round(dropsPerSec) >= 4 };
+        return { sec: Math.round(1 / dropsPerSec), drops: 1, isContinuous: false };
+    }
+
+    function renderParts() {
+        const container = document.getElementById('parts-container');
+        container.innerHTML = '';
+        partsData[currentType].forEach((part, index) => {
+            const btn = document.createElement('button');
+            btn.type = 'button';
+            btn.className = `btn-part ${selectedParts.includes(index) ? 'selected' : ''}`;
+            btn.innerHTML = `<span>${part.name}</span> <span>${part.val}%</span>`;
+            btn.onclick = () => togglePart(index);
+            container.appendChild(btn);
+        });
+    }
+
+    function updateTbsaFromSelection() {
+        if(selectedParts.length === 0) return;
+        let totalTbsa = selectedParts.reduce((sum, i) => sum + partsData[currentType][i].val, 0);
+        totalTbsa = Math.round(totalTbsa * 100) / 100;
+        document.getElementById('tbsa').value = totalTbsa > 100 ? 100 : totalTbsa;
+    }
+
+    function selectAllTbsaParts() {
+        selectedParts = partsData[currentType].map((_, index) => index);
+        renderParts();
+        updateTbsaFromSelection();
+        calculateFluid();
+    }
+
+    function togglePart(index) {
+        const pos = selectedParts.indexOf(index);
+        if (pos > -1) selectedParts.splice(pos, 1);
+        else selectedParts.push(index);
+        
+        renderParts();
+        if(selectedParts.length === 0) document.getElementById('tbsa').value = '';
+        else updateTbsaFromSelection();
+        
+        calculateFluid();
+    }
+
+    function resetTbsaParts() {
+        selectedParts = [];
+        document.getElementById('tbsa').value = '';
+        renderParts();
+        calculateFluid();
+    }
+
+    function calculateFluid() {
+        const resultBox = document.getElementById('result');
+        const normalView = document.getElementById('normal-protocol-view');
+        const unknownView = document.getElementById('unknown-protocol-view');
+        const childMaintBox = document.getElementById('child-maintenance-box');
+        const criticalVerbalText = document.getElementById('res-gtt-verbal-critical');
+
+        if (isUnknownWeight) {
+            resultBox.classList.add('show');
+            normalView.style.display = 'none';
+            unknownView.style.display = 'block';
+
+            let fixedSpeed = unknownAgeGroup === 'over13' ? 500 : (unknownAgeGroup === '6to12' ? 250 : 125);
+            let groupText = unknownAgeGroup === 'over13' ? "만 13세 이상 청소년 및 성인 추정" : (unknownAgeGroup === '6to12' ? "만 6세 ~ 12세 소아 추정" : "만 5세 이하 소아 추정");
+
+            if (burnType === 'electrical') { fixedSpeed *= 2; groupText += " (전기 화상 2배 증량)"; }
+
+            const matchResult = getRealisticDropRate((fixedSpeed * 20) / 60);
+            criticalVerbalText.innerHTML = matchResult.isContinuous ? 
+                `초기 8시간 투여 속도 지침:<br><span style="font-size:1.9rem; text-decoration: underline;">${matchResult.sec}초에 ${matchResult.drops}방울 (연속 주입)</span>` : 
+                `초기 8시간 투여 속도 지침:<br><span style="font-size:1.9rem; text-decoration: underline;">${matchResult.sec}초에 ${matchResult.drops}방울</span>씩 떨어뜨리십시오.`;
+
+            document.getElementById('res-unk-agegroup').innerText = groupText;
+            document.getElementById('res-unk-speed').innerText = fixedSpeed + " mL/h";
+            return;
+        }
+
+        normalView.style.display = 'block';
+        unknownView.style.display = 'none';
+
+        const weight = parseFloat(document.getElementById('weight').value);
+        const tbsa = parseFloat(document.getElementById('tbsa').value);
+
+        if (!weight || !tbsa || weight <= 0 || tbsa <= 0) {
+            resultBox.classList.remove('show');
+            criticalVerbalText.innerText = "⚠️ 데이터 입력 대기 중";
+            return;
+        }
+
+        let factor = (burnType === 'electrical') ? 4 : (tbsa >= 20 ? 2 : (currentType === 'adult' ? 4 : 3));
+        let formulaName = (burnType === 'electrical') ? "ABA 전기 화상 (4mL)" : (tbsa >= 20 ? "ABA 가이드라인 (2mL)" : `Parkland 공식 (${factor}mL)`);
+
+        const totalBurnFluid = factor * weight * tbsa;
+        const burnSpeed8h = (totalBurnFluid / 2) / 8;
+        let totalSpeed8h = burnSpeed8h; 
+
+        if (currentType === 'child' && weight <= 30) {
+            childMaintBox.style.display = 'block';
+            let childMaintenanceHr = (weight <= 10) ? weight * 4 : ((weight <= 20) ? 40 + (weight - 10) * 2 : 60 + (weight - 20));
+            totalSpeed8h += childMaintenanceHr;
+            document.getElementById('res-child-day-maintenance').innerText = Math.round(childMaintenanceHr * 24).toLocaleString();
+            document.getElementById('res-child-hr-maintenance').innerText = Math.round(childMaintenanceHr);
+            document.getElementById('res-child-add-text').innerText = `(+ 유지수액 ${Math.round(childMaintenanceHr)}mL/h 합산)`;
+        } else {
+            childMaintBox.style.display = 'none';
+            document.getElementById('res-child-add-text').innerText = '';
+        }
+
+        const gttPerMin = (totalSpeed8h * 20) / 60;
+        const matchResult = getRealisticDropRate(gttPerMin);
+
+        criticalVerbalText.innerHTML = matchResult.isContinuous ? 
+            `🔥 초기 8시간 투여 속도 지침:<br><span style="font-size:1.9rem; text-decoration: underline;">${matchResult.sec}초에 ${matchResult.drops}방울 (연속 주입)</span>` : 
+            `🔥 초기 8시간 투여 속도 지침:<br><span style="font-size:1.9rem; text-decoration: underline;">${matchResult.sec}초에 ${matchResult.drops}방울</span>씩 떨어뜨리십시오.`;
+
+        document.getElementById('res-formula').innerText = formulaName;
+        document.getElementById('res-total').innerText = Math.round(totalBurnFluid).toLocaleString();
+        document.getElementById('res-8h').innerText = Math.round(totalBurnFluid / 2).toLocaleString();
+        document.getElementById('res-total-speed').innerText = Math.round(totalSpeed8h);
+        document.getElementById('res-gtt-speed').innerText = Math.round(gttPerMin);
+        
+        resultBox.classList.add('show');
+    }
+
+    setPatientType('adult');
+</script>
+</body>
+</html>
