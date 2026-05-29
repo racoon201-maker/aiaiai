@@ -8,7 +8,7 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="화상수액계산">
     <link class="apple-touch-icon" href="https://fav.farm/🚑">
-    <link rel="icon" href="https://fav.farm/🚑">
+    <link class="icon" href="https://fav.farm/🚑">
     <style>
         :root {
             --primary-color: #d9534f;
@@ -53,6 +53,8 @@
             margin-bottom: 4px;
             font-size: 0.95rem;
         }
+        
+        /* 대괄호 문법 보정 및 기본 스타일 */
         input[type="number"], select {
             width: 100%;
             padding: 12px;
@@ -406,17 +408,17 @@
             labelInfo.innerText = "추정용 환자 정보";
             document.getElementById('btn-apply-est').style.display = 'block';
             let html = `<div class="adult-est-container">
-                <select id="est-age" onchange="handleAdultEstChange()"><option value="" style="color: green;">나이(대)</option>`;
+                <select id="est-age" onchange="handleAdultEstChange()"><option value="">나이(대)</option>`;
             for(let i=10; i<=90; i+=10) html += `<option value="${i}">${i}대</option>`;
             html += `</select>
                 <select id="est-gender" onchange="handleAdultEstChange()">
-                    <option value="" style="color: green;">성별</option><option value="M">남성</option><option value="F">여성</option>
+                    <option value="">성별</option><option value="M">남성</option><option value="F">여성</option>
                 </select>
                 <select id="est-body" onchange="handleAdultEstChange()">
-                    <option value="" style="color: green;">체형</option><option value="18.5">저체중</option><option value="22">정상</option><option value="26">과체중</option><option value="30">비만</option>
+                    <option value="">체형</option><option value="18.5">저체중</option><option value="22">정상</option><option value="26">과체중</option><option value="30">비만</option>
                 </select>
                 <select id="est-height" onchange="handleAdultEstChange()">
-                    <option value="" style="color: green;">키</option>`;
+                    <option value="">키</option>`;
             for(let h=130; h<=210; h+=10) html += `<option value="${h}">${h}cm</option>`;
             html += `</select></div>`;
             container.innerHTML = html;
@@ -426,10 +428,10 @@
             labelInfo.innerText = "나이 입력 시 면적 자동 연동";
             document.getElementById('btn-apply-est').style.display = 'none';
             let html = `<div class="age-split-container">
-                <select id="est-year" onchange="handleChildEstChange()"><option value="" style="color: green;">년</option>`;
+                <select id="est-year" onchange="handleChildEstChange()"><option value="">년</option>`;
             for (let y = 0; y <= 9; y++) html += `<option value="${y}">${y}년</option>`;
             html += `</select>
-                <select id="est-month" onchange="handleChildEstChange()"><option value="" style="color: green;">개월</option>`;
+                <select id="est-month" onchange="handleChildEstChange()"><option value="">개월</option>`;
             for (let m = 0; m <= 11; m++) html += `<option value="${m}">${m}개월</option>`;
             html += `</select></div>`;
             container.innerHTML = html;
@@ -453,8 +455,9 @@
         document.getElementById('lb-indicator').style.display = type === 'child' ? 'block' : 'none';
         document.getElementById('weight').disabled = false;
         
+        updateSelectors();
         if(type === 'child') updateLundBrowderChart(0, false);
-
+        else renderParts();
     }
 
     function updateLundBrowderChart(months, showIndicator = true) {
@@ -751,7 +754,6 @@
     }
 
     setPatientType('adult');
-    updateSelectors();
 </script>
 </body>
 </html>
