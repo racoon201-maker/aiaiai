@@ -70,15 +70,22 @@
             border-color: var(--secondary-color);
         }
 
-        /* 🔥 추가된 녹색 글씨 보정 스타일 (Placeholder 대기 상태일 때 녹색 적용) */
+        /* 🔥 Placeholder 대기 상태일 때 select 박스 자체의 글자를 녹색으로 */
         select:has(option[value=""]:checked) {
             color: green !important;
-            font-weight: bold;
+            font-weight: bold !important;
         }
-        /* 드롭다운을 눌러 목록이 열렸을 때 실제 선택지들은 다시 원래 어두운 색으로 보이도록 보정 */
+        
+        /* 🔥 드롭다운을 열었을 때, 안내 항목(value="")은 항상 녹색으로 유지 */
+        select option[value=""] {
+            color: green !important;
+            font-weight: bold !important;
+        }
+
+        /* 🔥 드롭다운을 열었을 때, 실제 선택지들은 원래 어두운 색으로 보정 */
         select option:not([value=""]) {
-            color: var(--dark-color);
-            font-weight: normal;
+            color: var(--dark-color) !important;
+            font-weight: normal !important;
         }
 
         .btn-group {
@@ -408,35 +415,35 @@
             labelInfo.innerText = "추정용 환자 정보";
             document.getElementById('btn-apply-est').style.display = 'block';
             let html = `<div class="adult-est-container">
-                <select id="est-age" onchange="handleAdultEstChange()"><option value="">나이(대)</option>`;
+                <select id="est-age" onchange="handleAdultEstChange()"><option value="" style="color: green; font-weight: bold;">나이(대)</option>`;
             for(let i=10; i<=90; i+=10) html += `<option value="${i}">${i}대</option>`;
             html += `</select>
                 <select id="est-gender" onchange="handleAdultEstChange()">
-                    <option value="">성별</option><option value="M">남성</option><option value="F">여성</option>
+                    <option value="" style="color: green; font-weight: bold;">성별</option><option value="M">남성</option><option value="F">여성</option>
                 </select>
                 <select id="est-body" onchange="handleAdultEstChange()">
-                    <option value="">체형</option><option value="18.5">저체중</option><option value="22">정상</option><option value="26">과체중</option><option value="30">비만</option>
+                    <option value="" style="color: green; font-weight: bold;">체형</option><option value="18.5">저체중</option><option value="22">정상</option><option value="26">과체중</option><option value="30">비만</option>
                 </select>
                 <select id="est-height" onchange="handleAdultEstChange()">
-                    <option value="">키</option>`;
+                    <option value="" style="color: green; font-weight: bold;">키</option>`;
             for(let h=130; h<=210; h+=10) html += `<option value="${h}">${h}cm</option>`;
             html += `</select></div>`;
             container.innerHTML = html;
                         
-            unknownSelect.innerHTML = `<option value="">-- 선택 --</option><option value="UNKNOWN_OVER13">⚠️ 정보모름 (성인/청소년)</option>`;
+            unknownSelect.innerHTML = `<option value="" style="color: green; font-weight: bold;">-- 선택 --</option><option value="UNKNOWN_OVER13">⚠️ 정보모름 (성인/청소년)</option>`;
         } else {
             labelInfo.innerText = "나이 입력 시 면적 자동 연동";
             document.getElementById('btn-apply-est').style.display = 'none';
             let html = `<div class="age-split-container">
-                <select id="est-year" onchange="handleChildEstChange()"><option value="">년</option>`;
+                <select id="est-year" onchange="handleChildEstChange()"><option value="" style="color: green; font-weight: bold;">년</option>`;
             for (let y = 0; y <= 9; y++) html += `<option value="${y}">${y}년</option>`;
             html += `</select>
-                <select id="est-month" onchange="handleChildEstChange()"><option value="">개월</option>`;
+                <select id="est-month" onchange="handleChildEstChange()"><option value="" style="color: green; font-weight: bold;">개월</option>`;
             for (let m = 0; m <= 11; m++) html += `<option value="${m}">${m}개월</option>`;
             html += `</select></div>`;
             container.innerHTML = html;
                         
-            unknownSelect.innerHTML = `<option value="">-- 선택 --</option>
+            unknownSelect.innerHTML = `<option value="" style="color: green; font-weight: bold;">-- 선택 --</option>
                 <option value="UNKNOWN_UNDER5">⚠️ 정보모름 (5세 이하)</option>
                 <option value="UNKNOWN_6TO12">⚠️ 정보모름 (6~12세)</option>`;
         }
