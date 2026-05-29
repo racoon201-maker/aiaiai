@@ -61,11 +61,24 @@
             border-radius: 8px;
             font-size: 1.05rem;
             background-color: #fff;
+            color: var(--dark-color);
         }
         input[type="number"]:focus, select:focus {
             outline: none;
             border-color: var(--secondary-color);
         }
+
+        /* 🔥 추가된 녹색 글씨 보정 스타일 (Placeholder 대기 상태일 때 녹색 적용) */
+        select:has(option[value=""]:checked) {
+            color: green !important;
+            font-weight: bold;
+        }
+        /* 드롭다운을 눌러 목록이 열렸을 때 실제 선택지들은 다시 원래 어두운 색으로 보이도록 보정 */
+        select option:not([value=""]) {
+            color: var(--dark-color);
+            font-weight: normal;
+        }
+
         .btn-group {
             display: flex;
             gap: 8px;
@@ -442,8 +455,6 @@
         
         if(type === 'child') updateLundBrowderChart(0, false);
 
-        updateSelectors();
-        resetTbsaParts();
     }
 
     function updateLundBrowderChart(months, showIndicator = true) {
@@ -740,6 +751,7 @@
     }
 
     setPatientType('adult');
+    updateSelectors();
 </script>
 </body>
 </html>
